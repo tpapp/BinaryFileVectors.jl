@@ -43,8 +43,9 @@ end
 
     # bad magic
     fn = tempname()
-    @test_throws ErrorException open_existing(BitstypeFileVector{Int64}, fn)
-    open(fn * ".bin", "w") do io
+    @test_throws(ErrorException,
+                 open_existing(BitstypeFileVector{Int64}, fn)) # no file yet
+    open(fn, "w") do io
         write(io, Int32(0))
     end
     @test_throws ArgumentError open_existing(BitstypeFileVector{Int64}, fn)

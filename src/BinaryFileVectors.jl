@@ -76,8 +76,7 @@ function mmap(b::BitstypeFileVector{T}) where T
     mmap(io, Vector{T}, len)
 end
 
-function open_existing(::Type{BitstypeFileVector{T}}, basename::AbstractString) where T
-    datafile = basename * ".bin"
+function open_existing(::Type{BitstypeFileVector{T}}, datafile::AbstractString) where T
     @argcheck isfile(datafile) ErrorException("File $(datafile) not found.")
     totalsize = filesize(datafile)
     io = open(datafile, "a+")
@@ -89,9 +88,8 @@ function open_existing(::Type{BitstypeFileVector{T}}, basename::AbstractString) 
     BitstypeFileVector{T}(io, len)
 end
 
-function create_empty(::Type{BitstypeFileVector{T}}, basename::AbstractString;
+function create_empty(::Type{BitstypeFileVector{T}}, datafile::AbstractString;
                       overwrite = false) where T
-    datafile = basename * ".bin"
     if !overwrite
         @argcheck !isfile(datafile) "Found existing file, use overwrite = true."
     end
