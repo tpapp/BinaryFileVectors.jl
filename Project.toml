@@ -1,0 +1,11 @@
+name = "BinaryFileVectors"
+uuid = "18f18a4c-90ce-11e8-21f8-d92a6735ced4"
+authors = ["Tamas K. Papp <tkpapp@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
+DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+Mmap = "a63ad114-7e13-5084-954f-fe012c677804"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
