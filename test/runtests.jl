@@ -33,3 +33,20 @@ using Mmap: mmap
     @test length(m2) == 7
     @test m2 == Float64.(1:7)
 end
+
+@testset "consistency checks" begin
+    # size mismatch
+    fn = tempname()
+    b = create_empty(BitstypeFileVector{Int32}, fn)
+    flush(b)
+    @test_throws ArgumentError open_existing(BitstypeFileVector{Int64}, fn)
+
+    # bad magic
+    fn = tempname()
+    @test_throws ErrorException open_existing(BitstypeFileVector{Int64}, fn)
+    open(fn * ".bin", "w") do io
+        write(io, Int32(0))
+    end
+    @test_throws ArgumentError open_existing(BitstypeFileVector{Int64}, fn)
+
+end

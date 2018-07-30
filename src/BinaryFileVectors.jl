@@ -22,12 +22,12 @@ eltype(::BinaryFileVector{T}) where T = T
 
 const MAGIC = 0x31564642        # "BFV1"
 
-function write_header(io::IO, T)
+function write_header(io::IO, ::Type{T}) where T
     write(io, MAGIC)
     write(io, Int32(sizeof(T)))
 end
 
-function verify_header(io::IO, T)
+function verify_header(io::IO, ::Type{T}) where T
     @argcheck read(io, UInt32) == MAGIC
     @argcheck read(io, Int32) == sizeof(T)
     nothing
@@ -78,7 +78,7 @@ end
 
 function open_existing(::Type{BitstypeFileVector{T}}, basename::AbstractString) where T
     datafile = basename * ".bin"
-    isfile(datafile) || return nothing
+    @argcheck isfile(datafile) ErrorException("File $(datafile) not found.")
     totalsize = filesize(datafile)
     io = open(datafile, "a+")
     seekstart(io)
@@ -96,7 +96,7 @@ function create_empty(::Type{BitstypeFileVector{T}}, basename::AbstractString;
         @argcheck !isfile(datafile) "Found existing file, use overwrite = true."
     end
     io = open(datafile, "w+")
-    write_header(io, Float64)
+    write_header(io, T)
     BitstypeFileVector{T}(io, 0)
 end
 
