@@ -49,4 +49,10 @@ end
     end
     @test_throws ArgumentError open_existing(BitstypeFileVector{Int64}, fn)
 
+    # dangling bytes
+    fn = tempname()
+    b = create_empty(BitstypeFileVector{Int32}, fn)
+    write(b.io, Int16(99))
+    flush(b)
+    @test_throws ArgumentError open_existing(BitstypeFileVector{Int32}, fn)
 end
