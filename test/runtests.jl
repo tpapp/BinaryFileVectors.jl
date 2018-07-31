@@ -22,6 +22,12 @@ using Mmap: mmap
     @test length(m) == 6
     @test m == Float64.(1:6)
 
+    # isopen and closing
+    @test isopen(b)
+    close(b)
+    @test !isopen(b)
+    @test_throws ErrorException push!(b, 9.0)
+
     # won't overwrite existing file
     @test_throws ArgumentError create_empty(BitstypeFileVector{T}, filename)
 
@@ -32,9 +38,15 @@ using Mmap: mmap
     @test m2 isa Vector{T}
     @test length(m2) == 7
     @test m2 == Float64.(1:7)
+
+    # mmap existing
+    m3 = mmap_existing(BitstypeFileVector{T}, filename)
+    @test m3 isa Vector{T}
+    @test length(m3) == 7
+    @test m3 == Float64.(1:7)
 end
 
-@testset "consistency checks" begin
+@testset "consistency checks and corner cases" begin
     # size mismatch
     fn = tempname()
     b = create_empty(BitstypeFileVector{Int32}, fn)

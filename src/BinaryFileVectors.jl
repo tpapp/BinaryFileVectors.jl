@@ -1,14 +1,14 @@
 __precompile__()
 module BinaryFileVectors
 
-export BitstypeFileVector, open_existing, create_empty
+export BitstypeFileVector, open_existing, create_empty, mmap_existing
 
 using ArgCheck: @argcheck
 using Parameters: @unpack
 using DocStringExtensions: SIGNATURES
 import Mmap: mmap, sync!
 
-import Base: append!, eltype, length, push!, flush
+import Base: append!, eltype, length, push!, flush, close, isopen
 
 
 # generic
@@ -35,7 +35,7 @@ end
 
 const HEADERLEN = 8
 
-const WRITEERRMSG = "Failed while writing to disk; file closed or disk full?"
+const WRITEERRMSG = "Failed while writing to disk; stream closed or disk full?"
 
 
 #
@@ -52,6 +52,10 @@ end
 length(b::BitstypeFileVector) = b.len
 
 flush(b::BitstypeFileVector) = flush(b.io)
+
+close(b::BitstypeFileVector) = close(b.io)
+
+isopen(b::BitstypeFileVector) = isopen(b.io)
 
 function push!(b::BitstypeFileVector{T}, x::T) where T
     @argcheck write(b.io, Ref(x)) == sizeof(T) ErrorException(WRITEERRMSG)
@@ -86,6 +90,13 @@ function open_existing(::Type{BitstypeFileVector{T}}, datafile::AbstractString) 
     @argcheck rem == 0 "$(rem) dangling bytes at the of the file."
     seekend(io)
     BitstypeFileVector{T}(io, len)
+end
+
+function mmap_existing(T::Type{<:BinaryFileVector}, path)
+    b = open_existing(T, path)
+    v = mmap(b)
+    close(b)
+    v
 end
 
 function create_empty(::Type{BitstypeFileVector{T}}, datafile::AbstractString;
